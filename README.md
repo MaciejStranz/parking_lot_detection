@@ -1,162 +1,162 @@
-# 🚗 Analiza Zajętości Miejsc Parkingowych przy użyciu YOLO i SSD
+# 🚗 Parking Spot Occupancy Analysis using YOLO and SSD
 
-Projekt ma na celu analizę zajętości miejsc parkingowych na podstawie zdjęć z lotu ptaka, przy użyciu nowoczesnych metod detekcji obiektów – **YOLO** oraz **SSD**. Przetwarzane są obrazy przedstawiające parkingi w różnych warunkach pogodowych oraz pod różnymi kątami, a wynik stanowi wizualizacja zajętości z informacją liczbową.
+This project aims to analyze parking spot occupancy based on bird's-eye view images using state-of-the-art object detection methods – **YOLO** and **SSD**. Images of parking lots under various weather conditions and from different angles are processed, and the output is a visual representation of occupancy along with numerical information.
 
-## 📌 Motywacja
+## 📌 Motivation
 
-Efektywne zarządzanie parkowaniem wpływa bezpośrednio na:
-- płynność ruchu,
-- zanieczyszczenie powietrza,
-- komfort życia mieszkańców.
+Efficient parking management directly impacts:
+- traffic flow,
+- air pollution,
+- and residents' quality of life.
 
-Celem projektu jest stworzenie systemu, który automatycznie wykryje i oceni zajętość miejsc parkingowych, a także umożliwi analizę wzorców parkowania.
-
----
-
-## 🗂️ Dane wejściowe i wyjściowe
-
-**Dane wejściowe:**
-- Zdjęcia z drona (różne kąty, różne warunki pogodowe)
-- Zbiór danych: **PKLot**
-
-**Dane wyjściowe:**
-- Obraz z naniesionymi ramkami zaznaczającymi miejsca parkingowe
-- Kolorowe oznaczenia: `zajęte` / `wolne`
-- Liczbowy wynik zliczający wolne i zajęte miejsca
+The goal of the project is to build a system that automatically detects and evaluates parking spot occupancy, and enables analysis of parking patterns.
 
 ---
 
-## 🧾 Zbiór danych: PKLot
+## 🗂️ Input and Output Data
 
-Zbiór **PKLot** zawiera:
+**Input Data:**
+- Drone images (various angles and weather conditions)
+- Dataset: **PKLot**
 
-- 12 416 zdjęć JPEG (1280×720 px)
-- 695 335 ręcznie oznaczonych miejsc parkingowych
-  - 48,6% zajęte
-  - 51,4% wolne
-- Dane z dwóch parkingów i trzech różnych kątów
-- Oznaczenia pogodowe: `sunny`, `rainy`, `cloudy`
-- Podział:
-  - 70% trening
-  - 20% walidacja
+**Output Data:**
+- Image with bounding boxes overlaid on parking spots
+- Color indicators: `occupied` / `vacant`
+- Numerical output showing count of occupied and free spots
+
+---
+
+## 🧾 Dataset: PKLot
+
+The **PKLot** dataset includes:
+
+- 12,416 JPEG images (1280×720 px)
+- 695,335 manually labeled parking spots
+  - 48.6% occupied
+  - 51.4% vacant
+- Data from two parking lots, three different angles
+- Weather labels: `sunny`, `rainy`, `cloudy`
+- Split:
+  - 70% training
+  - 20% validation
   - 10% test
 
-Przykładowe zdjęcie z datasetu:
+Sample image from the dataset:
 
 ![PKLot example](original.jpg)
 
 ---
 
-## ⚙️ Użyte metody
+## ⚙️ Methods Used
 
 ### 🧠 You Only Look Once (YOLO)
 
-YOLO to szybka, jednoprzebiegowa sieć do detekcji obiektów. Działa na zasadzie podziału obrazu na siatkę, a każda komórka przewiduje pozycje oraz klasy obiektów.
+YOLO is a fast, single-shot object detection network. It works by dividing the image into a grid, where each cell predicts object positions and classes.
 
-#### Zalety YOLO:
-- ⚡ Bardzo szybkie działanie (real-time)
-- 🎯 Wysoka dokładność
-- 🔄 Kontekst całego obrazu brany pod uwagę
-- 📉 Mniej fałszywych pozytywnych detekcji
+#### YOLO Advantages:
+- ⚡ Very fast (real-time)
+- 🎯 High accuracy
+- 🔄 Considers full image context
+- 📉 Fewer false positives
 
-#### Proces:
-1. Podział obrazu na siatkę
-2. Predykcja bounding boxów + klasy
-3. Skalowanie ramek
-4. Non-Maximum Suppression (NMS)
+#### Process:
+1. Divide image into grid
+2. Predict bounding boxes + class scores
+3. Scale boxes
+4. Apply Non-Maximum Suppression (NMS)
 
-YOLO świetnie sprawdza się w detekcji miejsc parkingowych na zdjęciach PKLot – radzi sobie z różnymi kątami, rozmiarami oraz złożonym tłem.
+YOLO performs well in detecting parking spots in PKLot images – handling various angles, sizes, and complex backgrounds.
 
 ---
 
 ### 📦 Single Shot MultiBox Detector (SSD)
 
-SSD to także metoda jednoprzebiegowa, bazująca na konwolucyjnych mapach cech i kotwicach (default boxes), z których każda przewiduje obecność obiektu.
+SSD is also a single-shot detector based on convolutional feature maps and default anchor boxes of various sizes and aspect ratios.
 
-#### Architektura:
-- Ekstraktor cech (np. VGG16, ResNet)
-- Warstwy Multibox (predykcja klasy + offset pozycji)
+#### Architecture:
+- Feature extractor (e.g., VGG16, ResNet)
+- Multibox layers (predict class + bounding box offsets)
 
-#### Proces:
-1. Ekstrakcja map cech
-2. Kotwice (różne rozmiary i proporcje)
-3. Predykcja klas i offsetów
-4. Non-Maximum Suppression (NMS)
+#### Process:
+1. Extract feature maps
+2. Apply anchors (default boxes)
+3. Predict class scores and offsets
+4. Apply Non-Maximum Suppression (NMS)
 
-#### Zalety SSD:
+#### SSD Advantages:
 - 🔥 Real-time performance
-- 🧩 Detekcja obiektów o różnych rozmiarach
-- 🛠️ Prosta implementacja
+- 🧩 Detects objects at multiple scales
+- 🛠️ Simple to implement
 
-W kontekście projektu SSD skutecznie identyfikuje miejsca parkingowe niezależnie od skali i perspektywy, oferując równowagę między prędkością a precyzją.
-
----
-
-## 🧪 Podział zbioru
-
-| Zbiór        | Liczba obrazów | Procentowy udział |
-|--------------|----------------|--------------------|
-| Treningowy   | 6891           | 70%                |
-| Walidacyjny  | 2483           | 20%                |
-| Testowy      | 1242           | 10%                |
+In this project, SSD effectively identifies parking spots regardless of scale or perspective, offering a good trade-off between speed and precision.
 
 ---
 
-## 📊 Wyniki Modelu YOLO
+## 🧪 Dataset Split
 
-Model **YOLO** osiągnął wysoką dokładność w detekcji miejsc parkingowych, szczególnie w zakresie średnich i dużych obiektów.
+| Set         | Number of Images | Percentage |
+|-------------|------------------|------------|
+| Training    | 6891             | 70%        |
+| Validation  | 2483             | 20%        |
+| Test        | 1242             | 10%        |
+
+---
+
+## 📊 YOLO Model Results
+
+The **YOLO** model achieved high accuracy in detecting parking spots, especially for medium and large objects.
 
 ### Average Precision (AP):
-- **AP (IoU=0.50:0.95)**: `0.833` – solidna ogólna wydajność.
-- **AP (IoU=0.50)**: `0.986` – bardzo dokładne wykrywanie przy luźniejszych kryteriach.
-- **AP (IoU=0.75)**: `0.979` – model utrzymuje wysoką precyzję przy bardziej rygorystycznych progach.
-- **AP (medium)**: `0.832` – dobra wydajność przy średnich obiektach.
-- **AP (large)**: `0.857` – dobra skuteczność przy większych obiektach.
+- **AP (IoU=0.50:0.95)**: `0.833` – solid overall performance.
+- **AP (IoU=0.50)**: `0.986` – excellent detection with looser IoU thresholds.
+- **AP (IoU=0.75)**: `0.979` – maintains high precision under stricter thresholds.
+- **AP (medium)**: `0.832` – good performance on medium-sized objects.
+- **AP (large)**: `0.857` – effective detection of larger objects.
 
 ### Average Recall (AR):
-- **AR (maxDets=1)**: `0.026` – model ma trudności przy pojedynczych obiektach.
-- **AR (maxDets=10)**: `0.217` – poprawa przy większej liczbie detekcji.
-- **AR (maxDets=100)**: `0.877` – bardzo dobra skuteczność przy pełnej detekcji.
+- **AR (maxDets=1)**: `0.026` – limited recall for single detections.
+- **AR (maxDets=10)**: `0.217` – improved with more detections.
+- **AR (maxDets=100)**: `0.877` – strong recall at full detection scale.
 - **AR (medium)**: `0.877`
 - **AR (large)**: `0.889`
 
-### Podsumowanie:
-Model YOLO pokazuje bardzo wysoką skuteczność przy większej liczbie detekcji oraz wysoką precyzję niezależnie od IoU. Nadaje się do praktycznych zastosowań w systemach monitorowania parkingów.
+### Summary:
+YOLO shows very high precision across different IoU thresholds and solid performance with larger detection counts. It's well-suited for real-world parking monitoring systems.
 
 ---
 
-## 📊 Wyniki Modelu SSD
+## 📊 SSD Model Results
 
-Model **SSD** uzyskał jeszcze wyższe wyniki w wielu metrykach, zwłaszcza przy średnich i dużych obiektach.
+The **SSD** model achieved even higher results in several metrics, especially for medium and large objects.
 
 ### Average Precision (AP):
-- **AP (IoU=0.50:0.95)**: `0.904` – bardzo wysoka ogólna skuteczność.
-- **AP (IoU=0.50)**: `0.984` – znakomita dokładność.
-- **AP (IoU=0.75)**: `0.979` – utrzymuje wysoką precyzję również przy bardziej restrykcyjnych progach.
-- **AP (small)**: `0.834` – dobra wydajność przy mniejszych obiektach.
+- **AP (IoU=0.50:0.95)**: `0.904` – excellent overall accuracy.
+- **AP (IoU=0.50)**: `0.984` – very high precision.
+- **AP (IoU=0.75)**: `0.979` – consistent precision across thresholds.
+- **AP (small)**: `0.834` – solid performance for small objects.
 - **AP (medium)**: `0.931`
 - **AP (large)**: `0.984`
 
 ### Average Recall (AR):
-- **AR (maxDets=1)**: `0.028` – ograniczona skuteczność przy pojedynczych detekcjach.
-- **AR (maxDets=10)**: `0.231` – nieco lepiej, ale wciąż niższa skuteczność.
-- **AR (maxDets=100)**: `0.931` – bardzo wysoka skuteczność przy większej liczbie detekcji.
+- **AR (maxDets=1)**: `0.028` – limited at single-object detection.
+- **AR (maxDets=10)**: `0.231` – slight improvement.
+- **AR (maxDets=100)**: `0.931` – excellent performance with full detections.
 - **AR (small)**: `0.872`
 - **AR (medium)**: `0.957`
 - **AR (large)**: `0.992`
 
-### Podsumowanie:
-Model SSD wykazuje **wyjątkową dokładność i skuteczność**, szczególnie w wykrywaniu obiektów średnich i dużych. Dzięki wysokim wartościom AP i AR sprawdzi się w systemach rozpoznawania miejsc parkingowych z dużą dokładnością.
+### Summary:
+The SSD model shows **exceptional accuracy and recall**, particularly in detecting medium and large objects. Thanks to its high AP and AR values, it’s a strong candidate for precise parking detection applications.
 
 ---
 
-## 🏁 Wnioski
+## 🏁 Conclusion
 
-Oba modele – **YOLO** i **SSD** – osiągają bardzo wysoką skuteczność w detekcji miejsc parkingowych, jednak:
-- YOLO lepiej radzi sobie przy różnych wartościach IoU, ale ma nieco niższy AR.
-- SSD dominuje w dokładności i skuteczności przy większych obiektach i liczbach detekcji.
+Both models – **YOLO** and **SSD** – achieved very high performance in detecting parking spot occupancy. However:
 
-Wybór modelu zależy od konkretnego zastosowania: SSD może być preferowany do dokładniejszych aplikacji z pełną detekcją, podczas gdy YOLO sprawdzi się dobrze w szybkich, mniej obciążających systemach.
+- YOLO performs better across varying IoU values but has slightly lower recall.
+- SSD excels in both precision and recall for medium and large objects.
+
+The model choice depends on the specific use case: SSD may be preferred for highly accurate full-detection systems, while YOLO is ideal for fast, lightweight applications.
 
 ---
-
