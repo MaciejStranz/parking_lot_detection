@@ -19,7 +19,7 @@ def train_one_epoch(model, train_loader, optimizer, device, grad_clip=None):
     model.train()
     running_loss = 0.0
 
-    for images, targets in tqdm(train_loader, desc="Trening"):
+    for images, targets in tqdm(train_loader, desc="Training"):
         images = [image.to(device) for image in images]
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
@@ -32,10 +32,10 @@ def train_one_epoch(model, train_loader, optimizer, device, grad_clip=None):
         elif isinstance(loss_dict, list):
             losses = sum(loss_dict)
         else:
-            raise ValueError("Nieoczekiwany typ dla loss_dict")
+            raise ValueError("Unexpected type for loss_dict")
 
         if torch.isnan(losses):
-            print("Wartość straty to NaN. Pomijam ten krok.")
+            print("Loss value is NaN. Skipping this step.")
             continue
 
         losses.backward()
@@ -48,7 +48,7 @@ def train_one_epoch(model, train_loader, optimizer, device, grad_clip=None):
         running_loss += losses.item()
 
     epoch_loss = running_loss / len(train_loader)
-    print(f"Strata po epoce treningowej: {epoch_loss}")
+    print(f"Validation loss after epoch: {epoch_loss}")
     return epoch_loss
 
 
@@ -56,7 +56,7 @@ def validate_one_epoch(model, valid_loader, device):
     model.eval()
     running_loss = 0.0
     with torch.no_grad():
-        for images, targets in tqdm(valid_loader, desc="Walidacja"):
+        for images, targets in tqdm(valid_loader, desc="Validation"):
             images = [image.to(device) for image in images]
             targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
@@ -204,10 +204,10 @@ grad_clip = 5.0
 
 
 for epoch in range(num_epochs):
-    print(f"Epoka {epoch + 1}/{num_epochs}")
+    print(f"Epoch {epoch + 1}/{num_epochs}")
     train_loss = train_one_epoch(model, train_loader, optimizer, device, grad_clip)
     # valid_loss = validate_one_epoch(model, valid_loader, device)
-    print(f"Strata treningowa: {train_loss}")
+    print(f"Train loss: {train_loss}")
     torch.save(model.state_dict(), f"model_epoch_{epoch+41}.pth")
 
-print("Trening zakończony.")
+print("Training finished.")
