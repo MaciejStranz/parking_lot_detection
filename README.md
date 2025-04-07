@@ -43,7 +43,6 @@ The **PKLot** dataset includes:
 
 Sample image from the dataset:
 
-![PKLot example](original.jpg)
 
 ---
 
