@@ -41,7 +41,6 @@ The **PKLot** dataset includes:
   - 20% validation
   - 10% test
 
-Sample image from the dataset:
 
 
 ---
